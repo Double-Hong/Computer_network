@@ -49,10 +49,13 @@ IP包在从目标网站传回本机时，每路过一个路由器，它的TTL就
 使用 `ping/?` 命令了解该命令的各种选项并实际使用。  
 ![ping/?](./pictures/p5.png)  
 - `ping -n 10 www.baidu.com`   
-向百度发出请求，并让它返回**10条**回显请求。
+向百度发出请求，并让它返回**10条**回显请求。  
+
 ![ping-n](./pictures/p6.png)  
+
 - `ping -a www.baidu.com`  
-ping -a 将**地址**解析为**主机名**
+ping -a 将**地址**解析为**主机名**  
+
 ![ping-a](./pictures/p7.png)  
   
 ***  
@@ -95,7 +98,8 @@ ping -a 将**地址**解析为**主机名**
 `ARP`（Address Resolution Protocol）即地址解析协议，是用于根据给定网络层地址即 IP 地址，查找并得到其对应的数据链路层地址即**MAC地址**的协议。  
 #### 实作一  
 运行 `arp -a` 命令查看当前的 arp 缓存， 请留意缓存了些什么。  
-![arp-a](./pictures/p11.png)
+![arp-a](./pictures/p11.png)  
+
 缓存了一下IP地址下所对应的MAC物理地址  
 使用 `arp -d *` 删除全部缓存，再次查看缓存  
 ![arp-d](./pictures/p12.png)
