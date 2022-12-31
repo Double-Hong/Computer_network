@@ -7,6 +7,11 @@
   - [ipconfig](#ipconfig)  
   - [ping](#ping)  
   - [tracert](#tracert)
+  - [DHCP](#DHCP)
+  - [netstat](#netstat)
+  - [DNS](#DNS)
+  - [cache](#cache)
+- [Wireshark 实验](#Wireshark 实验)
 
   
 
@@ -102,5 +107,86 @@ ping -a 将**地址**解析为**主机名**
 
 缓存了一下IP地址下所对应的MAC物理地址  
 使用 `arp -d *` 删除全部缓存，再次查看缓存  
-![arp-d](./pictures/p12.png)
+![arp-d](./pictures/p12.png)  
+运行`arp -d *`后，本机与其他IP地址的一些物理地址的缓存记录被清除了。被清除的应该是本机最近访问到的节点的地址。
+#### 实作二  
+使用 `arp /?` 命令了解该命令的各种选项。
+![arp/?](./pictures/p13.png)  
+#### 实作三  
+假设当前网关的 IP 地址是 `192.168.0.1`，MAC 地址是 `5c-d9-98-f1-89-64`，请使用 `arp -s 192.168.0.1 5c-d9-98-f1-89-64` 命令设置其为静态类型的。
+![arp添加地址1](./pictures/p14.png)  
+第一次输入`arp -s 192.168.0.1 5c-d9-98-f1-89-64`失败，需要以管理员身份运行。  
+![管理员arp添加地址](./pictures/p15.png)  
+以管理员身份运行cmder后成功，可以看到已经将192.168.0.1的物理地址添加到了arp缓存中。  
+> 我们将网关或其它计算机的 arp 信息设置为静态有什么优缺点？  
 
+配置静态ARP表项可以增加通信的安全性。静态ARP表项可以限制和指定IP地址的设备通信时只使用指定的MAC地址，此时攻击报文无法修改此表项的IP地址和MAC地址的映射关系，从而保护了本设备和指定设备间的正常通信。  
+  
+***  
+  
+### DHCP  
+DHCP（Dynamic Host Configuration Protocol）即动态主机配置协议，是一个用于 IP 网络的网络协议，位于 OSI 模型的应用层，使用 UDP 协议工作，主要有两个用途：
+
+- 用于内部网或网络服务供应商自动分配 IP 地址给用户
+- 用于内部网管理员对所有电脑作中央管理  
+
+简单的说，DHCP 可以让计算机自动获取/释放网络配置。  
+    
+#### 实作一  
+使用 `ipconfig/release` 命令释放自动获取的网络配置，并用 `ipconfig/renew` 命令重新获取。  
+![ipconfig/release](./pictures/p16.png)  
+![ipconfig/renew](./pictures/p17.png)  
+使用`ipconfig/renew`后本机重新获取了IP。  
+  
+***  
+  
+### netstat  
+无论是使用 TCP 还是 UDP，任何一个网络服务都与特定的端口（Port Number）关联在一起。因此，每个端口都对应于某个通信协议/服务。
+
+`netstat`（Network Statistics）是在内核中访问网络连接状态及其相关信息的命令行程序，可以显示路由表、实际的网络连接和网络接口设备的状态信息，以及与 IP、TCP、UDP 和 ICMP 协议相关的统计数据，一般用于检验本机各端口的网络服务运行状况。
+  
+#### 实作一  
+Windows 系统将一些常用的端口与服务记录在 `C:\WINDOWS\system32\drivers\etc\services` 文件中，请查看该文件了解常用的端口号分配。  
+![services](./pictures/p18.png)  
+#### 实作二  
+使用 `netstat -an` 命令，查看计算机当前的网络连接状况。  
+![netsta-an](./pictures/p19.png)  
+  
+***  
+  
+### DNS  
+`DNS`（Domain Name System）即域名系统，是互联网的一项服务。它作为将域名和 IP 地址相互映射的一个分布式数据库，能够使人更方便地访问互联网。DNS 使用 TCP 和 UDP 的 53 号端口。  
+#### 实作一  
+Windows 系统将一些固定的/静态的 DNS 信息记录在 `C:\WINDOWS\system32\drivers\etc\hosts` 文件中，如我们常用的 `localhost` 就对应 `127.0.0.1` 。  
+![host](./pictures/p20.png)  
+#### 实作二  
+解析过的 **DNS** 记录将会被缓存，以利于加快解析速度。使用 `ipconfig /displaydns` 命令查看。我们也可以使用 `ipconfig /flushdns` 命令来清除所有的 DNS 缓存。  
+![ipconfig /displaydns](./pictures/p21.png)  
+使用`ipconfig /displaydns`后，显示了DNS解析器缓存的内容，包括了很多从本地Hosts文件预装载的记录以及由域名解析服务器解析的所有资源记录。  
+![ipconfig /flushdns](./pictures/p22.png)  
+#### 实作三  
+使用 `nslookup qige.io` 命令，将使用默认的 DNS 服务器查询该域名。  
+![nslookup qige.io](./pictures/p23.png)  
+  
+***  
+  
+### cache  
+`cache` 即缓存，是 IT 领域一个重要的技术。我们此处提到的 cache 主要是浏览器缓存。
+
+浏览器缓存是根据 HTTP 报文的缓存标识进行的，是性能优化中简单高效的一种优化方式了。一个优秀的缓存策略可以缩短网页请求资源的距离，减少延迟，并且由于缓存文件可以重复利用，还可以减少带宽，降低网络负荷。  
+#### 实作一  
+打开 Chrome 或 Firefox 浏览器，访问 https://qige.io ，接下来敲 F12 键 或 Ctrl + Shift + I 组合键打开开发者工具，选择 Network 面板后刷新页面。  
+![qige.io](./pictures/p24.png)  
+可以看到加载该页面花费了296ms。  
+在该页面显示的列表下，看到Size列下有`memory cache`和`disk cache`两种字样。  
+memory cache 就是内存中的缓存，读取速度很快，但是只要我们关闭了页面，内存中的缓存就被释放了。  
+disk cache 就是存储在硬盘中的缓存，disk cache生存的时间会比memory cache更长。  
+#### 实作二  
+接下来仍在 Network 面板，选择 `Disable cache` 选项框，表明当前不使用 cache，页面数据全部来自于 Internet，刷新页面，再次在开发者工具底部查看加载该页面花费的时间。  
+![disable cache](./pictures/p25.png)  
+在选择 `Disable cache` 后重新刷新了页面，这次加载这个页面所用的时间变为了1.47s，明显比使用缓存时所花费的时间要多。  
+  
+***  
+***  
+  
+## Wireshark 实验
